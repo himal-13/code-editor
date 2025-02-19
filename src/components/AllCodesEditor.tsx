@@ -11,7 +11,7 @@ const AllCodesEditor = () => {
   return (
     <>
     <div className="w-full flex h-[400px] gap-[10px] my-4">
-        <HtmlCode handleHtmlChange={(text)=>setHtmlCode(text)}/>
+        <HtmlCode htmlInput={htmlCode} handleHtmlChange={(text)=>setHtmlCode(text)}/>
         <CssCode handleCssChange={(text)=>setCssCode(text)}/>
         <JsCode handleJsChange={(text)=>setJsCode(text)} />
     </div>
