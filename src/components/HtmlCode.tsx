@@ -6,17 +6,12 @@ interface HtmlPrps{
     htmlInput:string
 }
 
-// const HTMLTags = [
-//     'div','h1','h2','h3','h4','h5','h6','p','ol','li','ul','form','section','span','input','button'
-// ]
-
 const HtmlCode = ({handleHtmlChange, htmlInput}:HtmlPrps) => {
 
-      const handleEditorDidMount = (editor: any, monaco: any) => {
-        console.log(editor)
+      const handleEditorDidMount = (_editor: any, monaco: any) => {
         setupHTMLSuggestions(monaco);
       };
-    
+
 
   
   return (
@@ -43,7 +38,7 @@ const HtmlCode = ({handleHtmlChange, htmlInput}:HtmlPrps) => {
                     scrollBeyondLastLine: false,
                     automaticLayout: true,
                   }}
-                className="flex-1 mt-2 min-h-[300px]"/>
+                className="flex-1 mt-2 min-h-[200px]"/>
 
     </div>
   )

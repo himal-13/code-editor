@@ -7,7 +7,9 @@ interface OutPutProps{
 }
 const OutPut = ({htmlCode,cssCode,jsCode}:OutPutProps) => {
 
-    const[srcCode,setSrcCode] = useState('')
+    const[srcCode,setSrcCode] = useState(`
+
+                    `)
 
     useEffect(()=>{
 
