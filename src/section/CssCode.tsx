@@ -1,5 +1,7 @@
 import { Editor } from "@monaco-editor/react";
 import { setupCSSSuggestions } from "./CssSuggetion";
+import { useSettings } from "../context/SettingContext";
+import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 
 interface CssProps{
     handleCssChange:(text:string)=>void,
@@ -7,13 +9,19 @@ interface CssProps{
 }
 
 const CssCode = ({handleCssChange, cssInput}:CssProps) => {
+  const{fullScreenMode,changeFullScreenMode} = useSettings()
     const handleEditorDidMount = (_editor: any, monaco: any) => {
       setupCSSSuggestions(monaco);
     };
 
   return (
-    <div className="flex-1 rounded-lg border-[1px] border-gray-600 m-2 flex flex-col overflow-x-hidden">
-        <h3 className="py-2 px-3 text-3xl bg-gray-800 text-white font-bold">CSS</h3>
+    <div className="flex-1 rounded-lg border-[1px] border-gray-600 m-2 flex flex-col ">
+        <div className={`text-3xl bg-gray-800 text-white font-bold flex justify-between items-center`}>
+           <span className="py-2 px-3 bg-gray-600">CSS</span>
+           <section className={`flex gap-2 mx-2 flex-row`}>
+                {fullScreenMode=='css'?<MdFullscreenExit className='cursor-pointer' onClick={()=>changeFullScreenMode('css')} /> :<MdFullscreen className='cursor-pointer' onClick={()=>changeFullScreenMode('css')}/>}
+            </section>
+        </div>
         <Editor
         defaultLanguage="css"
         value={cssInput}
@@ -26,7 +34,7 @@ const CssCode = ({handleCssChange, cssInput}:CssProps) => {
           scrollBeyondLastLine: false,
           automaticLayout: true,
         }}
-        className="flex-1 mt-2 min-h-[200px]"
+        className="flex-1 mt-2 "
       />
     </div>
   )

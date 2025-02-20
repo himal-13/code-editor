@@ -1,8 +1,11 @@
 import React, { createContext, ReactNode, useState } from "react";
 
+
+
 interface SettingsContextType{
-    fullScreenMode:boolean,
-    changeFullScreenMode:()=>void
+    fullScreenMode: ('html' | 'css' | 'js')|'',
+    changeFullScreenMode:(mode:'html'|'css'|'js')=>void,
+
 
 }
 
@@ -11,15 +14,17 @@ const SettingsContext = createContext<SettingsContextType | null>(null)
 
 
 const SettingsProvider:React.FC<{children:ReactNode}>= ({children})=>{
-    const[fullScreenMode,setFullScreenMode] = useState(false)
+    const[fullScreenMode,setFullScreenMode] = useState<'html' | 'css' | 'js'|''>('')
 
-    const changeFullScreenMode =()=>{
-        setFullScreenMode(!fullScreenMode)
-    }
+        const changeFullScreenMode = (mode: 'html' | 'css' | 'js') => {
+            setFullScreenMode(mode)
+            if(fullScreenMode !==''){
+                setFullScreenMode('')
+            }
 
-
+        }
     return(
-        <SettingsContext.Provider value={{fullScreenMode,changeFullScreenMode}}>
+        <SettingsContext.Provider value={{fullScreenMode,changeFullScreenMode,}}>
             {children}
         </SettingsContext.Provider>
     )

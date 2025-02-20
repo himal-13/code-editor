@@ -37,7 +37,7 @@ const OutPut = ({htmlCode,cssCode,jsCode}:OutPutProps) => {
             srcDoc={srcCode}
             title="Preview"
             sandbox="allow-scripts"
-            className="h-full w-full"
+            className="min-h-full max-w-full"
             />
 
         </div>
