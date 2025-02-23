@@ -6,7 +6,7 @@ interface OutPutProps{
     jsCode:string
 }
 const OutPut = ({htmlCode,cssCode,jsCode}:OutPutProps) => {
-
+    
     const[srcCode,setSrcCode] = useState(`
 
                     `)
@@ -37,7 +37,7 @@ const OutPut = ({htmlCode,cssCode,jsCode}:OutPutProps) => {
             srcDoc={srcCode}
             title="Preview"
             sandbox="allow-scripts"
-            className="min-h-full max-w-full"
+            className="min-h-full w-full "
             />
 
         </div>
