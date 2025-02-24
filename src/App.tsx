@@ -1,8 +1,9 @@
-import AllCodesEditor from "./components/AllCodesEditor"
+import Login from "./assets/auth/Login"
 
 const App = () => {
   return (
-    <AllCodesEditor/>
+    // <AllCodesEditor/>
+    <Login/>
   )
 }
 
