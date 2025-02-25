@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock,  FaSun, FaMoon } from 'react-icons/fa';
 import { useSettings } from '../../context/SettingContext';
-import { auth, } from '../services/Firebase';
-import { createUserWithEmailAndPassword, } from 'firebase/auth';
+// import { auth, } from '../services/Firebase';
+// import { createUserWithEmailAndPassword, } from 'firebase/auth';
 
 
 interface FormData {
@@ -51,13 +51,13 @@ export default function AuthPage() {
     e.preventDefault();
     if (validateForm()) {
       console.log('Form submitted:', formData);
-     try{
-        await createUserWithEmailAndPassword(auth,formData.email,formData.password)
+    //  try{
+    //     await createUserWithEmailAndPassword(auth,formData.email,formData.password)
 
-     }catch(e){
+    //  }catch(e){
         
 
-     }
+    //  }
     }
   };
 
