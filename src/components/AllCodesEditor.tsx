@@ -4,7 +4,7 @@ import HtmlCode from "../section/HtmlCode";
 import JsCode from "../section/JsCode";
 import OutPut from "./OutPut";
 import { useSettings } from "../context/SettingContext";
-import { FiSun, FiMoon, FiSave, FiTerminal} from "react-icons/fi";
+import { FiSave, FiTerminal} from "react-icons/fi";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Console from "./Console";
@@ -15,18 +15,16 @@ interface LogEntry {
 }
 
 const AllCodesEditor = () => {
-  const { fullScreenMode, changeFullScreenMode, theme, toggleTheme } = useSettings();
+  const { fullScreenMode, changeFullScreenMode, theme } = useSettings();
   const [cssCode, setCssCode] = useState('body { margin: 0; padding: 20px; }');
   const [jsCode, setJsCode] = useState('console.log("Hello from JS!");');
   const [htmlCode, setHtmlCode] = useState(`<!DOCTYPE html>
 <html>
   <head>
     <title>My Project</title>
-    <style>${cssCode}</style>
   </head>
   <body>
     <h1>Hello World!</h1>
-    <script>${jsCode}</script>
   </body>
 </html>`);
 
@@ -105,39 +103,15 @@ const AllCodesEditor = () => {
 
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-      <header className="p-4 border-b flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">DevCode Editor</h1>
-          <p className="text-sm text-gray-500 sm:block hidden">A powerful web development playground</p>
-        </div>
-        <div className="flex gap-4 items-center">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-          >
-            {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
-          </button>
-          <button
-            onClick={exportProject}
-            disabled={isExporting}
-            className={`flex items-center gap-2 px-4 py-2 rounded ${
-              isExporting 
-                ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' 
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
-          >
-            <FiSave /> {isExporting ? "Exporting..." : "Export"}
-          </button>
-        </div>
-      </header>
+    <div className={`min-h-screen w-full ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
 
       <div className="p-4">
         
-        <div className="flex gap-4 mb-4">
+        <div className="flex  justify-between ">
+          <div className="flex gap-4">
           <button
             onClick={() => setActiveFeature('editor')}
-            className={`px-4 py-2 rounded ${
+            className={`px-4 py-2 rounded scale-90 sm:scale-100 ${
               activeFeature === 'editor' 
                 ? 'bg-blue-500 text-white' 
                 : 'text-gray-200 dark:bg-gray-700'
@@ -147,7 +121,7 @@ const AllCodesEditor = () => {
           </button>
           <button
             onClick={() => setActiveFeature('console')}
-            className={`px-4 py-2 rounded ${
+            className={`px-4 py-2 rounded scale-90 sm:scale-100 ${
               activeFeature === 'console' 
                 ? 'bg-blue-500 text-white' 
                 : 'text-gray-200 dark:bg-gray-700'
@@ -155,6 +129,20 @@ const AllCodesEditor = () => {
           >
             <FiTerminal /> Console
           </button>
+          </div>
+          <div className="">
+          <button
+            onClick={exportProject}
+            disabled={isExporting}
+            className={`flex items-center gap-2 px-4 py-2 rounded scale-90 sm:scale-100 ${
+              isExporting 
+                ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' 
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+          >
+            <FiSave /> {isExporting ? "Exporting..." : "Export"}
+          </button>
+          </div>
         </div>
 
         {activeFeature === 'editor' ? (

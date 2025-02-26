@@ -30,9 +30,9 @@ const OutPut = ({htmlCode,cssCode,jsCode}:OutPutProps) => {
 
 
   return (
-    <div className=" m-2 rounded-lg border-[1px] border-gray-400 ">
+    <div className=" rounded-lg border-[1px] border-gray-400 bg-white">
         <h3 className="p-3 bg-gray-800 text-white font-bold text-3xl">Preview</h3>
-        <div className="h-screen p-2">
+        <div className="h-screen">
             <iframe
             srcDoc={srcCode}
             title="Preview"
