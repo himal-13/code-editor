@@ -103,7 +103,7 @@ const AllCodesEditor = () => {
 
 
   return (
-    <div className={`min-h-screen w-full ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen w-full ${theme === 'dark' ? 'bg-[#1F1F1F] text-white' : 'bg-white text-gray-900'}`}>
 
       <div className="p-4">
         

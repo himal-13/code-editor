@@ -18,7 +18,7 @@ const Console = ({jsCode,handleChangeCode,consoleCode,runCode}:ConsoleProps) => 
   const{theme} = useSettings()
 
   return (
-    <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
+    <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-[#1F1F1F' : 'bg-gray-100'}`}>
 
     <div className="min-h-[50vh] flex lg:flex-row flex-col gap-2 font-mono text-sm">
       <div className="flex-1 h-[50vh] ">

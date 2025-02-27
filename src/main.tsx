@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Homepage from './pages/Homepage.tsx'
 import PlayGround from './pages/PlayGround.tsx'
 import AuthProvider from './context/AuthContext.tsx'
+import Login from './auth/Login.tsx'
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
   {
     path:'/playground',
     element:<PlayGround/>
+  },
+  {
+    path:'login',
+    element:<Login/>
   }
 ])
 

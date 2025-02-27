@@ -1,7 +1,9 @@
 // src/components/AuthPage.tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaUser, FaEnvelope, FaLock,  FaSun, FaMoon } from 'react-icons/fa';
-import { useSettings } from '../../context/SettingContext';
+import { useSettings } from '../context/SettingContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 // import { auth, } from '../services/Firebase';
 // import { createUserWithEmailAndPassword, } from 'firebase/auth';
 
@@ -18,15 +20,26 @@ interface Errors {
   password?: string;
 }
 
-export default function AuthPage() {
+export default function Login() {
   const { theme, toggleTheme } = useSettings();
+  const{currentUser,login,signup,loading} = useAuth()
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate()
   const [formData, setFormData] = useState<FormData>({
     username: '',
     email: '',
     password: ''
   });
   const [errors, setErrors] = useState<Errors>({});
+
+  useEffect(()=>{
+    if(currentUser){
+      navigate('/')
+      return;
+
+    }
+
+  },[currentUser])
 
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
@@ -51,13 +64,20 @@ export default function AuthPage() {
     e.preventDefault();
     if (validateForm()) {
       console.log('Form submitted:', formData);
-    //  try{
-    //     await createUserWithEmailAndPassword(auth,formData.email,formData.password)
+      if(isLogin){
+        try{
+          await login(formData.email,formData.password)
+        }catch(e){
 
-    //  }catch(e){
-        
+        }
+      }else{
+        try{
+          await signup(formData.email,formData.password)
+        }catch(e){
 
-    //  }
+        }
+      }
+
     }
   };
 
@@ -72,6 +92,7 @@ export default function AuthPage() {
     setFormData({ username: '', email: '', password: '' });
     setErrors({});
   };
+  if(loading)return(<h1>Loading...</h1>)
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${
