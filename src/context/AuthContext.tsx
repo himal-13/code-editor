@@ -4,29 +4,30 @@ import { auth } from "../assets/services/Firebase"
 
 
 interface AuthContextType{
-    currentUser:User|null
+    currentUser:User|null,
+    loading:boolean
 
 }
 const AuthContext = createContext<AuthContextType |null>(null)
 
 const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
     const[currentUser,setCurrentUser] = useState<User |null>(null)
+    const[loading,setLoading] = useState(true)
 
     useEffect(()=>{
         const unSubscribe = onAuthStateChanged(auth,(user)=>{
             setCurrentUser(user)
-        
+            setLoading(false)        
         })
     
-
         return ()=>unSubscribe()
 
     },[])
 
 
     return (
-        <AuthContext.Provider value={{currentUser}}>
-            {children}
+        <AuthContext.Provider value={{currentUser,loading}}>
+            {!loading && children}
         </AuthContext.Provider>
     )
 }
