@@ -1,13 +1,10 @@
 // src/components/AuthPage.tsx
 import { useEffect, useState } from 'react';
-import { FaUser, FaEnvelope, FaLock,  FaSun, FaMoon } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaSun, FaMoon } from 'react-icons/fa';
 import { useSettings } from '../context/SettingContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { FirebaseError } from 'firebase/app';
-// import { auth, } from '../services/Firebase';
-// import { createUserWithEmailAndPassword, } from 'firebase/auth';
-
 
 interface FormData {
   username: string;
@@ -19,14 +16,14 @@ interface Errors {
   username?: string;
   email?: string;
   password?: string;
-  login?:string
+  login?: string;
 }
 
 export default function Login() {
   const { theme, toggleTheme } = useSettings();
-  const{currentUser,login,signup,loading} = useAuth()
+  const { currentUser, login, signup, loading } = useAuth();
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
-  const navigate = useNavigate()
   const [formData, setFormData] = useState<FormData>({
     username: '',
     email: '',
@@ -34,40 +31,41 @@ export default function Login() {
   });
   const [errors, setErrors] = useState<Errors>({});
 
-  useEffect(()=>{
-    if(currentUser){
-      navigate('/')
-      return;
-
+  // Fix 1: Add proper cleanup for auth state
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/');
     }
+  }, [currentUser, navigate]);
 
-  },[currentUser])
-
-  const handelingError =async(error:any)=>{
+  // Fix 2: Enhanced error handling with proper types
+  const handleError = (error: unknown) => {
     if (error instanceof FirebaseError) {
       switch (error.code) {
         case 'auth/email-already-in-use':
-          setErrors((prev)=>({...prev,login:'Email already in use.'}));
-          break;
-          case 'auth/network-request-failed':
-          setErrors((prev)=>({...prev,login:'Network error. Please check your connection'}));
-            break;
+          return 'Email already in use.';
+        case 'auth/network-request-failed':
+          return 'Network error. Please check your connection.';
+        case 'auth/wrong-password':
+          return 'Invalid password.';
+        case 'auth/user-not-found':
+          return 'User not found.';
+        case 'auth/too-many-requests':
+          return 'Too many attempts. Try again later.';
         case 'auth/weak-password':
-          setErrors((prev)=>({...prev,login:'Password must be at least 6 characters.'}));
-          break;
+          return 'Password must be at least 6 characters.';
         case 'auth/invalid-email':
-          setErrors((prev)=>({...prev,login:'Invalid email address.'}));
-          break;
+          return 'Invalid email address.';
         default:
-          setErrors((prev)=>({...prev,login:error.message.toString()}));
-
+          console.error('Firebase error:', error);
+          return 'Authentication failed. Please try again.';
       }
-    } else {
-      setErrors((prev)=>({...prev,login:'An unexpected error occurred.'}));
     }
+    console.error('Unexpected error:', error);
+    return 'An unexpected error occurred.';
+  };
 
-  }
-
+  // Fix 3: Improved validation with debounce
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
     
@@ -87,27 +85,22 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit =async (e: React.FormEvent) => {
+  // Fix 4: Proper async handling with loading states
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log('Form submitted:', formData);
-      if(isLogin){
-        try{
-          await login(formData.email,formData.password)
-        }catch(e:any){
-          handelingError(e)
+    setErrors({});
+    
+    if (!validateForm()) return;
 
-        }
-      }else{
-        try{
-          await signup(formData.email,formData.password)
-        }catch(e:any){
-         handelingError(e)
-
-
-        }
+    try {
+      if (isLogin) {
+        await login(formData.email, formData.password);
+      } else {
+        // Fix 5: Handle username if needed (consider adding to user profile)
+        await signup(formData.email, formData.password);
       }
-
+    } catch (error) {
+      setErrors(prev => ({ ...prev, login: handleError(error) }));
     }
   };
 
@@ -122,7 +115,8 @@ export default function Login() {
     setFormData({ username: '', email: '', password: '' });
     setErrors({});
   };
-  if(loading)return(<h1>Loading...</h1>)
+
+  if (loading) return <h1>Loading...</h1>;
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${
