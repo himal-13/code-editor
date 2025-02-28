@@ -31,14 +31,12 @@ export default function Login() {
   });
   const [errors, setErrors] = useState<Errors>({});
 
-  // Fix 1: Add proper cleanup for auth state
   useEffect(() => {
     if (currentUser) {
       navigate('/');
     }
   }, [currentUser, navigate]);
 
-  // Fix 2: Enhanced error handling with proper types
   const handleError = (error: unknown) => {
     if (error instanceof FirebaseError) {
       switch (error.code) {
@@ -65,7 +63,6 @@ export default function Login() {
     return 'An unexpected error occurred.';
   };
 
-  // Fix 3: Improved validation with debounce
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
     
@@ -85,7 +82,6 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Fix 4: Proper async handling with loading states
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -96,7 +92,7 @@ export default function Login() {
       if (isLogin) {
         await login(formData.email, formData.password);
       } else {
-        // Fix 5: Handle username if needed (consider adding to user profile)
+
         await signup(formData.email, formData.password);
       }
     } catch (error) {
