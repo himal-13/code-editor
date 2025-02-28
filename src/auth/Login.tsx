@@ -4,6 +4,7 @@ import { FaUser, FaEnvelope, FaLock,  FaSun, FaMoon } from 'react-icons/fa';
 import { useSettings } from '../context/SettingContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { FirebaseError } from 'firebase/app';
 // import { auth, } from '../services/Firebase';
 // import { createUserWithEmailAndPassword, } from 'firebase/auth';
 
@@ -18,6 +19,7 @@ interface Errors {
   username?: string;
   email?: string;
   password?: string;
+  login?:string
 }
 
 export default function Login() {
@@ -40,6 +42,31 @@ export default function Login() {
     }
 
   },[currentUser])
+
+  const handelingError =async(error:any)=>{
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          setErrors((prev)=>({...prev,login:'Email already in use.'}));
+          break;
+          case 'auth/network-request-failed':
+          setErrors((prev)=>({...prev,login:'Network error. Please check your connection'}));
+            break;
+        case 'auth/weak-password':
+          setErrors((prev)=>({...prev,login:'Password must be at least 6 characters.'}));
+          break;
+        case 'auth/invalid-email':
+          setErrors((prev)=>({...prev,login:'Invalid email address.'}));
+          break;
+        default:
+          setErrors((prev)=>({...prev,login:`${isLogin?"Login":'Signup'} failed. Please try again.`}));
+
+      }
+    } else {
+      setErrors((prev)=>({...prev,login:'An unexpected error occurred.'}));
+    }
+
+  }
 
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
@@ -67,13 +94,16 @@ export default function Login() {
       if(isLogin){
         try{
           await login(formData.email,formData.password)
-        }catch(e){
+        }catch(e:any){
+          handelingError(e)
 
         }
       }else{
         try{
           await signup(formData.email,formData.password)
-        }catch(e){
+        }catch(e:any){
+         handelingError(e)
+
 
         }
       }
@@ -133,7 +163,7 @@ export default function Login() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Username Field */}
+          {errors.login && <p className='p-2 bg-red-400'>{errors.login}</p>}
           {!isLogin && (
             <div>
               <label className={`block mb-2 ${
