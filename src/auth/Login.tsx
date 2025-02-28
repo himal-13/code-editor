@@ -59,7 +59,7 @@ export default function Login() {
           setErrors((prev)=>({...prev,login:'Invalid email address.'}));
           break;
         default:
-          setErrors((prev)=>({...prev,login:`${isLogin?"Login":'Signup'} failed. Please try again.`}));
+          setErrors((prev)=>({...prev,login:error.message.toString()}));
 
       }
     } else {
@@ -287,7 +287,7 @@ export default function Login() {
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button
             onClick={toggleAuthMode}
-            className={`hover:underline focus:outline-none ${
+            className={`hover:underline focus:outline-none cursor-pointer ${
               theme === 'light' ? 'text-blue-500' : 'text-blue-400'
             }`}
           >

@@ -30,11 +30,11 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
     },[])
     const signup = useCallback((email:string, password:string) => {
         return createUserWithEmailAndPassword(auth, email, password);
-      }, []);
+      }, [auth]);
     
       const login = useCallback((email:string, password:string) => {
         return signInWithEmailAndPassword(auth, email, password);
-      }, []);
+      }, [auth]);
     
       const logout = useCallback(() => {
         return signOut(auth);
