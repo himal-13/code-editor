@@ -3,10 +3,17 @@ import Navbar from "../components/Navbar"
 import { useSettings } from "../context/SettingContext"
 import { CgCode } from "react-icons/cg"
 import { useNavigate } from "react-router-dom"
+import { useLoadingUser } from "../hooks/useLoadingUser"
 
 const Homepage = () => {
     const{theme} = useSettings()
+    const{loading} = useLoadingUser()
     const navigate= useNavigate()
+    if(loading){
+      return(
+      <h1 className="text-4xl absolute left-1/2 top-1/2 -translate-1/2"> Loading...</h1>
+    )
+    }
   return (
     <div className={`min-h-screen max-w-full ${theme==='dark'?'bg-[#1F1F1F] text-white':'bg-white text-black'}`}>
         <Navbar/>

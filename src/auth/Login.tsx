@@ -2,11 +2,12 @@
 import { useEffect, useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaSun, FaMoon } from 'react-icons/fa';
 import { useSettings } from '../context/SettingContext';
-import { useAuth } from '../context/AuthContext';
+import { dbUserType, useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { FirebaseError } from 'firebase/app';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/Firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth, db } from '../services/Firebase';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 
 interface FormData {
   username: string;
@@ -32,6 +33,7 @@ export default function Login() {
     password: ''
   });
   const [errors, setErrors] = useState<Errors>({});
+  const[isUsernameExist,setIsUsernameExist] = useState<boolean | null>(null)
 
   useEffect(() => {
     if (currentUser) {
@@ -50,6 +52,8 @@ export default function Login() {
           return 'Invalid password.';
         case 'auth/user-not-found':
           return 'User not found.';
+        case 'auth/invalid-credential':
+          return 'Invalid email or password'
         case 'auth/too-many-requests':
           return 'Too many attempts. Try again later.';
         case 'auth/weak-password':
@@ -57,11 +61,11 @@ export default function Login() {
         case 'auth/invalid-email':
           return 'Invalid email address.';
         default:
-          console.error('Firebase error:', error);
+          // console.error('Firebase error:', error);
           return 'Authentication failed. Please try again.';
       }
     }
-    console.error('Unexpected error:', error);
+    // console.error('Unexpected error:', error);
     return 'An unexpected error occurred.';
   };
 
@@ -80,21 +84,28 @@ export default function Login() {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
     
-    if (!validateForm()) return;
+    if (!validateForm() || isUsernameExist ) return;
 
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth,formData.email, formData.password)
       } else {
-        await createUserWithEmailAndPassword(auth,formData.email,formData.password)
+        const credentials =await createUserWithEmailAndPassword(auth,formData.email,formData.password)
+        await addDoc(collection(db,'users'),{
+          email:formData.email,
+          userName:formData.username,
+
+
+        })
+        await updateProfile(credentials.user,{displayName:formData.username})
       }
     } catch (error) {
       setErrors(prev => ({ ...prev, login: handleError(error) }));
@@ -105,6 +116,7 @@ export default function Login() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     setErrors(prev => ({ ...prev, [name]: undefined }));
+
   };
 
   const toggleAuthMode = () => {
@@ -112,6 +124,39 @@ export default function Login() {
     setFormData({ username: '', email: '', password: '' });
     setErrors({});
   };
+
+  const checkUserName = async()=>{
+    try{
+          const querrySnapshot = await getDocs(collection(db,'users'));
+          const fetchData = querrySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(), 
+            })as dbUserType)
+            const allUserNames =fetchData.map((nam)=>nam.userName)
+            console.log(allUserNames)
+            if(allUserNames && allUserNames.includes(formData.username.toLowerCase())){
+              setIsUsernameExist(true)
+            }else{
+              setIsUsernameExist(false)
+
+            }
+            
+      }catch(er){
+          // console.log(er)
+      
+      }
+
+
+}
+useEffect(()=>{
+  const fetchUserNamesData=async()=>{
+   await checkUserName()
+
+  }
+  fetchUserNamesData()
+
+
+},[formData.username])
 
   if (loading) return <h1>Loading...</h1>;
 
@@ -182,6 +227,8 @@ export default function Login() {
               {errors.username && (
                 <p className="text-red-500 text-sm mt-1">{errors.username}</p>
               )}
+              {isUsernameExist && <p className="text-red-500 text-sm mt-1">Username exists</p>}
+              
             </div>
           )}
 

@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, User, UserCredential } from "firebase/auth"
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react"
-import { auth } from "../services/Firebase"
+import { auth, db,} from "../services/Firebase"
+import { collection, getDocs } from "firebase/firestore"
 
 
 interface AuthContextType{
@@ -8,22 +9,49 @@ interface AuthContextType{
     loading:boolean,
     signup:(email:string,password:string)=>Promise<UserCredential>
     login:(email:string,password:string)=>Promise<UserCredential>
-    logout:()=>Promise<void>
+    logout:()=>Promise<void>,
+    dbUser:dbUserType | undefined,
+    alldbUsers:dbUserType[] | []
+
+}
+
+export interface dbUserType{
+  userName:string,
+  id?:string,
+  email:string
 
 }
 const AuthContext = createContext<AuthContextType |null>(null)
 
 const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
     const[currentUser,setCurrentUser] = useState<User |null>(null)
+    const[dbUser,setdbUser] = useState<dbUserType | undefined>(undefined)
+    const[alldbUsers,setAlldbUsers] = useState<dbUserType[]|[]>([])
     const[loading,setLoading] = useState(true)
 
     
+    const getdbUsers = async()=>{
+      const querrySnapshot = await getDocs(collection(db,'users'));
+      const fetchData = querrySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(), 
+        })as dbUserType)
+        setAlldbUsers(fetchData)
+        if(alldbUsers.length>0 && currentUser){
+          setdbUser(fetchData.find((d)=>d.email == currentUser.email))
+
+        }
+        console.log(fetchData)
+
+    }
 
     useEffect(()=>{
         const unSubscribe = onAuthStateChanged(auth,(user)=>{
             setCurrentUser(user)
-            setLoading(false)        
+
         })
+        getdbUsers()
+        setLoading(false)        
     
         return ()=>unSubscribe()
 
@@ -47,6 +75,8 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
           signup,
           login,
           logout,
+          dbUser,
+          alldbUsers
 
         }),
         [
@@ -55,6 +85,7 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
           signup,
           login,
           logout,
+          alldbUsers
 
         ]
     )
