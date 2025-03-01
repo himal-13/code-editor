@@ -5,6 +5,8 @@ import { useSettings } from '../context/SettingContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { FirebaseError } from 'firebase/app';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../services/Firebase';
 
 interface FormData {
   username: string;
@@ -21,7 +23,7 @@ interface Errors {
 
 export default function Login() {
   const { theme, toggleTheme } = useSettings();
-  const { currentUser, login, signup, loading } = useAuth();
+  const { currentUser, loading } = useAuth();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState<FormData>({
@@ -90,10 +92,9 @@ export default function Login() {
 
     try {
       if (isLogin) {
-        await login(formData.email, formData.password);
+        await signInWithEmailAndPassword(auth,formData.email, formData.password)
       } else {
-
-        await signup(formData.email, formData.password);
+        await createUserWithEmailAndPassword(auth,formData.email,formData.password)
       }
     } catch (error) {
       setErrors(prev => ({ ...prev, login: handleError(error) }));
