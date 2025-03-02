@@ -7,6 +7,7 @@ import Homepage from './pages/Homepage.tsx'
 import PlayGround from './pages/PlayGround.tsx'
 import AuthProvider from './context/AuthContext.tsx'
 import Login from './auth/Login.tsx'
+import ProjectPage from './pages/ProjectPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path:'login',
     element:<Login/>
+  },
+  {
+    path:'/project/:id',
+    element:<ProjectPage/>
   }
 ])
 

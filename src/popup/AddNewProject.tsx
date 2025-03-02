@@ -7,11 +7,24 @@ import { db } from "../services/Firebase"
 import { MdErrorOutline } from "react-icons/md"
 import { SiTicktick } from "react-icons/si"
 import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 
-interface ProjectType{
+interface ContributorType{
+  userName:string,
+  userType:"admin"|"user",
+  email:string
+
+}
+export interface ProjectType{
   title:string,
   description:string,
-  id?:string
+  id?:string,
+  htmlCode:string,
+  cssCode:string,
+  jsCode:string,
+  contributor:ContributorType[],
+  isPublic:boolean
+
 }
 
 const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
@@ -21,6 +34,7 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
     const[projectError,setError] = useState(false)
     const{currentUser} = useAuth()
     const[projectVisiability,setProjectVisiabilty] = useState('public')
+    const navigate = useNavigate()
 
     // const[creatingProjectLoading,setCreatingProjectLoading] = useState(false)
 
@@ -68,7 +82,7 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
         jsCode:'',
         contributor:[
           {userName:currentUser.displayName,
-           userType:'Admin',
+           userType:'admin',
            email:currentUser.email
           }
         ],
@@ -76,10 +90,29 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
 
       })
       console.log('project created')
+      navigateProject(projectTitle)
+
 
     }catch(e){
 
     }finally{
+
+    }
+
+  }
+
+  const navigateProject = async(title:string)=>{
+    try{
+      const querrySnapshotProjects = await getDocs(collection(db,'projects'))
+      const fetchProjects = querrySnapshotProjects.docs.map((proj)=>({
+        id:proj.id,
+        ...proj.data()
+      })as ProjectType)
+      const currentProject = fetchProjects.find((proj)=>proj.title === title)
+      if(currentProject){
+        navigate(`/project/${currentProject.id}`)
+      }
+    }catch(e){
 
     }
 
