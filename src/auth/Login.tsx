@@ -103,7 +103,6 @@ export default function Login() {
           email:formData.email,
           userName:formData.username,
 
-
         })
         await updateProfile(credentials.user,{displayName:formData.username})
       }
@@ -291,7 +290,7 @@ useEffect(()=>{
 
           <button
             type="submit"
-            className={`w-full py-2 rounded-lg transition duration-200 ${
+            className={`w-full py-2 rounded-lg transition duration-200 cursor-pointer ${
               theme === 'light'
                 ? 'bg-blue-500 hover:bg-blue-600 text-white'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'

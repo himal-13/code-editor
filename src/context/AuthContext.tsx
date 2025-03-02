@@ -30,27 +30,47 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
     const[loading,setLoading] = useState(true)
 
     
-    const getdbUsers = async()=>{
-      const querrySnapshot = await getDocs(collection(db,'users'));
-      const fetchData = querrySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(), 
-        })as dbUserType)
-        setAlldbUsers(fetchData)
-        if(alldbUsers.length>0 && currentUser){
-          setdbUser(fetchData.find((d)=>d.email == currentUser.email))
-
-        }
-        console.log(fetchData)
-
+    const getdbUsers = async () => {
+      if(currentUser && !loading){
+        setLoading(true)
+      try {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        let currentDbUser: dbUserType | undefined = undefined;
+        const fetchData = querySnapshot.docs.map((doc) => {
+          const userData = { id: doc.id, ...doc.data() } as dbUserType;
+          
+          if (currentUser?.email === userData.email) {
+            currentDbUser = userData;
+          }
+          
+          return userData;
+        });
+    
+        setAlldbUsers(fetchData);
+        setdbUser(currentDbUser ?? undefined);
+    
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        setdbUser(undefined);
+      }finally{
+        setLoading(false)
+      }
     }
+    };
+    useEffect(() => {
+      let isMounted = true;
+      const fetchData = async () => {
+        await getdbUsers();
+      };
+      fetchData();
+      return () => { isMounted = false };
+    }, [currentUser]);
 
     useEffect(()=>{
         const unSubscribe = onAuthStateChanged(auth,(user)=>{
             setCurrentUser(user)
 
         })
-        getdbUsers()
         setLoading(false)        
     
         return ()=>unSubscribe()

@@ -4,11 +4,16 @@ import { useSettings } from "../context/SettingContext"
 import { CgCode } from "react-icons/cg"
 import { useNavigate } from "react-router-dom"
 import { useLoadingUser } from "../hooks/useLoadingUser"
+import { useState } from "react"
+import AddNewProject from "../popup/AddNewProject"
 
 const Homepage = () => {
     const{theme} = useSettings()
+    // const{dbUser} = useAuth()
     const{loading} = useLoadingUser()
+    const[showNewProjectMenu,setShowNewProjectMenu] = useState(false)
     const navigate= useNavigate()
+
     if(loading){
       return(
       <h1 className="text-4xl absolute left-1/2 top-1/2 -translate-1/2"> Loading...</h1>
@@ -32,11 +37,12 @@ const Homepage = () => {
             </div>
           </section>
           <section className=" p-4 sm:max-w-[60%] left-1/2 -translate-x-1/2 flex  md:gap-[5vw] gap-4 relative z-10 ">
-             <div className={`sm:h-[200px] w-[200px] p-[10px] border-[3px] border-orange-500 rounded-2xl flex flex-col justify-center items-center cursor-pointer ${theme==='dark'? 'hover:bg-[#2E2E2E] bg-[#2E2E2E] shadow-2xl':'hover:bg-gray-200 bg-white'}`}><BiPlus/><span>create</span> <span>New project</span></div>
+             <div onClick={()=>setShowNewProjectMenu(true)} className={`sm:h-[200px] w-[200px] p-[10px] border-[3px] border-orange-500 rounded-2xl flex flex-col justify-center items-center cursor-pointer ${theme==='dark'? 'hover:bg-[#2E2E2E] bg-[#2E2E2E] shadow-2xl':'hover:bg-gray-200 bg-white'}`}><BiPlus/><span>create</span> <span>New project</span></div>
              <div className={`sm:h-[200px] w-[200px] p-[10px] border-[1px] border-gray-500 rounded-2xl flex flex-col justify-center items-center cursor-pointer ${theme==='dark'? 'hover:bg-[#2E2E2E] bg-[#2E2E2E] shadow-2xl':'hover:bg-gray-200 bg-white'}`} onClick={()=>navigate('/playground')}><CgCode/><span>Playground</span></div>
           </section>
             
         </main>
+        {showNewProjectMenu && <AddNewProject  handleClose={()=>setShowNewProjectMenu(false)}/>}
     </div>
   )
 }
