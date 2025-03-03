@@ -130,7 +130,10 @@ const AllCodesEditor = () => {
             <FiTerminal /> Console
           </button>
           </div>
-          <div className="">
+          <div className="flex gap-4 ">
+            <button className={`px-4 py-2 cursor-pointer bg-gray-400`}>
+              Save to Project
+            </button>
           <button
             onClick={exportProject}
             disabled={isExporting}

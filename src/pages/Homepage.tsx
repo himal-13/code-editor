@@ -4,15 +4,34 @@ import { useSettings } from "../context/SettingContext"
 import { CgCode } from "react-icons/cg"
 import { useNavigate } from "react-router-dom"
 import { useLoadingUser } from "../hooks/useLoadingUser"
-import { useState } from "react"
-import AddNewProject from "../popup/AddNewProject"
+import { useEffect, useState } from "react"
+import AddNewProject, { ProjectType } from "../popup/AddNewProject"
+import { SquareLoader } from "react-spinners"
+import { useAuth } from "../context/AuthContext"
 
 const Homepage = () => {
     const{theme} = useSettings()
-    // const{dbUser} = useAuth()
+    const{currentUser,projects,projectLoading} = useAuth()
+    const[myProjects,setMyProjects] = useState<ProjectType[]|[]>([])
     const{loading} = useLoadingUser()
     const[showNewProjectMenu,setShowNewProjectMenu] = useState(false)
     const navigate= useNavigate()
+
+    const getMyProjects = async()=>{
+      if(currentUser && projects && projects.length>0){
+        setMyProjects(projects.filter((proj)=>proj.admins.includes(currentUser.uid)))
+
+      }
+      console.log(projects)
+
+    }
+
+    useEffect(()=>{
+      getMyProjects()
+      
+    },[currentUser])
+
+
 
     if(loading){
       return(
@@ -36,11 +55,24 @@ const Homepage = () => {
 
             </div>
           </section>
+          {projectLoading || loading?(
+            <div className="absolute left-1/2">
+            <SquareLoader color={`${theme==='dark'?'':''}`}size={50}/>
+            </div>
+          ):(
+            
           <section className=" p-4 sm:max-w-[60%] left-1/2 -translate-x-1/2 flex  md:gap-[5vw] gap-4 relative z-10 ">
              <div onClick={()=>setShowNewProjectMenu(true)} className={`sm:h-[200px] w-[200px] p-[10px] border-[3px] border-orange-500 rounded-2xl flex flex-col justify-center items-center cursor-pointer ${theme==='dark'? 'hover:bg-[#2E2E2E] bg-[#2E2E2E] shadow-2xl':'hover:bg-gray-200 bg-white'}`}><BiPlus/><span>create</span> <span>New project</span></div>
+             {
+              myProjects.length>0 && myProjects.map((project)=>(
+              <div className={`sm:h-[200px] w-[200px] p-[10px] border-[1px] border-gray-500 rounded-2xl flex flex-col justify-center items-center cursor-pointer ${theme==='dark'? 'hover:bg-[#2E2E2E] bg-[#2E2E2E] shadow-2xl':'hover:bg-gray-200 bg-white'}`} onClick={()=>navigate(`/project/${project.id}`)} key={project.id}><CgCode/><span>{project.title}</span></div>
+
+              ))
+             }
              <div className={`sm:h-[200px] w-[200px] p-[10px] border-[1px] border-gray-500 rounded-2xl flex flex-col justify-center items-center cursor-pointer ${theme==='dark'? 'hover:bg-[#2E2E2E] bg-[#2E2E2E] shadow-2xl':'hover:bg-gray-200 bg-white'}`} onClick={()=>navigate('/playground')}><CgCode/><span>Playground</span></div>
           </section>
-            
+            )
+          }
         </main>
         {showNewProjectMenu && <AddNewProject  handleClose={()=>setShowNewProjectMenu(false)}/>}
     </div>

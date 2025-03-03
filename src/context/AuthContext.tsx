@@ -2,6 +2,7 @@ import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndP
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { auth, db,} from "../services/Firebase"
 import { collection, getDocs } from "firebase/firestore"
+import { ProjectType } from "../popup/AddNewProject"
 
 
 interface AuthContextType{
@@ -11,7 +12,9 @@ interface AuthContextType{
     login:(email:string,password:string)=>Promise<UserCredential>
     logout:()=>Promise<void>,
     dbUser:dbUserType | undefined,
-    alldbUsers:dbUserType[] | []
+    alldbUsers:dbUserType[] | [],
+    projectLoading:boolean,
+    projects:ProjectType[]| undefined
 
 }
 
@@ -28,6 +31,8 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
     const[dbUser,setdbUser] = useState<dbUserType | undefined>(undefined)
     const[alldbUsers,setAlldbUsers] = useState<dbUserType[]|[]>([])
     const[loading,setLoading] = useState(true)
+    const[projectLoading,setProjectLoading] = useState(true)
+    const[projects,setProjects] = useState<ProjectType[]| undefined>()
 
     
     const getdbUsers = async () => {
@@ -39,7 +44,7 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
         const fetchData = querySnapshot.docs.map((doc) => {
           const userData = { id: doc.id, ...doc.data() } as dbUserType;
           
-          if (currentUser?.email === userData.email) {
+          if (currentUser.email === userData.email) {
             currentDbUser = userData;
           }
           
@@ -58,12 +63,10 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
     }
     };
     useEffect(() => {
-      let isMounted = true;
       const fetchData = async () => {
         await getdbUsers();
       };
       fetchData();
-      return () => { isMounted = false };
     }, [currentUser]);
 
     useEffect(()=>{
@@ -76,6 +79,32 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
         return ()=>unSubscribe()
 
     },[])
+
+
+            const getProjects = async()=>{
+                setProjectLoading(true)
+                try{
+                    const querrySnapshotProjects = await getDocs(collection(db,'projects'))
+                    const fetchProjects = querrySnapshotProjects.docs.map((proj)=>({
+                        id:proj.id,
+                        ...proj.data()
+                    })as ProjectType)
+                    setProjects(fetchProjects)
+    
+                }catch(e){
+    
+                }finally{
+                    setProjectLoading(false)
+                }
+            }
+
+            useEffect(()=>{
+              const projectData = async()=>{
+                await getProjects()
+              }
+              projectData()
+
+            },[currentUser])
     const signup = useCallback((email:string, password:string) => {
         return createUserWithEmailAndPassword(auth, email, password);
       }, [auth]);
@@ -96,7 +125,9 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
           login,
           logout,
           dbUser,
-          alldbUsers
+          alldbUsers,
+          projectLoading,
+          projects
 
         }),
         [
@@ -105,7 +136,8 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
           signup,
           login,
           logout,
-          alldbUsers
+          alldbUsers,
+          projects
 
         ]
     )

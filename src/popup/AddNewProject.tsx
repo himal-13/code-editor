@@ -9,12 +9,7 @@ import { SiTicktick } from "react-icons/si"
 import { useAuth } from "../context/AuthContext"
 import { useNavigate } from "react-router-dom"
 
-interface ContributorType{
-  userName:string,
-  userType:"admin"|"user",
-  email:string
 
-}
 export interface ProjectType{
   title:string,
   description:string,
@@ -22,9 +17,10 @@ export interface ProjectType{
   htmlCode:string,
   cssCode:string,
   jsCode:string,
-  contributor:ContributorType[],
-  isPublic:boolean
-
+  isPublic:boolean,
+  admins:string,
+  contributor:string,
+  
 }
 
 const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
@@ -36,7 +32,6 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
     const[projectVisiability,setProjectVisiabilty] = useState('public')
     const navigate = useNavigate()
 
-    // const[creatingProjectLoading,setCreatingProjectLoading] = useState(false)
 
     const handleProjectTitleChange =async(e:React.ChangeEvent<HTMLInputElement>)=>{
       setShowLoading(true)
@@ -80,12 +75,8 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
         htmlCode:'',
         cssCode:'',
         jsCode:'',
-        contributor:[
-          {userName:currentUser.displayName,
-           userType:'admin',
-           email:currentUser.email
-          }
-        ],
+        contributor:[],
+        admins:[currentUser.uid],
         isPublic:projectVisiability ==='public'?true:false
 
       })
