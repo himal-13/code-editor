@@ -1,4 +1,4 @@
-import { ClipLoader} from "react-spinners"
+import { CircleLoader, ClipLoader, ClockLoader} from "react-spinners"
 import { useSettings } from "../context/SettingContext"
 import { IoMdClose } from "react-icons/io"
 import { useEffect, useState } from "react"
@@ -7,7 +7,7 @@ import { db } from "../services/Firebase"
 import { MdErrorOutline } from "react-icons/md"
 import { SiTicktick } from "react-icons/si"
 import { useAuth } from "../context/AuthContext"
-import { useNavigate } from "react-router-dom"
+import { Await, useNavigate } from "react-router-dom"
 
 
 export interface ProjectType{
@@ -30,6 +30,7 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
     const[projectError,setError] = useState(false)
     const{currentUser} = useAuth()
     const[projectVisiability,setProjectVisiabilty] = useState('public')
+    const[creatingProject,setCreatingProject] = useState(false)
     const navigate = useNavigate()
 
 
@@ -68,8 +69,13 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
   }
 
   const handleCreateProject = async()=>{
-    if(projectTitle.trim().length<4 || projectError ||!currentUser)return;
+    if(!currentUser){
+      navigate('/login')
+      return;
+    }
+    if(projectTitle.trim().length<4 || projectError)return;
     try{
+      setCreatingProject(true)
       await addDoc(collection(db,'projects'),{
         title:projectTitle,
         htmlCode:'',
@@ -80,13 +86,17 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
         isPublic:projectVisiability ==='public'?true:false
 
       })
-      console.log('project created')
-      navigateProject(projectTitle)
+      setProjectTitle('')
 
 
     }catch(e){
 
     }finally{
+      setTimeout(() => {
+        setCreatingProject(false)
+      navigateProject(projectTitle)
+        
+      }, 1000);
 
     }
 
@@ -130,7 +140,7 @@ const AddNewProject = ({handleClose}:{handleClose:()=>void}) => {
           </section>
           <section className="text-end m-4">
             <button onClick={handleClose} className={`px-4 py-2 border-[.1px] cursor-pointer mr-4 text-[19px] rounded-xl ${theme==='dark'?'border-gray-800 bg-[#0f0f0f]':'border-gray-200 bg-[#f0f0f0]'} `}>close</button>
-            <button onClick={handleCreateProject} className={`px-4 py-2 border-[.1px] cursor-pointer mr-4 text-[19px] rounded-xl ${theme==='dark'?'border-gray-800 bg-[#f0f0f0] text-black hover:bg-[#a1a1a1]':'border-gray-200 bg-[#0f0f0f] text-white hover:bg-[#1a1a1a]'}`}>create</button>
+            <button disabled={creatingProject} onClick={handleCreateProject} className={`px-4 py-2 border-[.1px] cursor-pointer mr-4 text-[19px] relative rounded-xl ${theme==='dark'?'border-gray-800 bg-[#f0f0f0] text-black hover:bg-[#a1a1a1]':'border-gray-200 bg-[#0f0f0f] text-white hover:bg-[#1a1a1a] '} ${creatingProject && 'cursor-not-allowed'}`}>{creatingProject?<ClockLoader size={18} color="#fff"/>:<span className="">create</span>}</button>
           </section>
          
 

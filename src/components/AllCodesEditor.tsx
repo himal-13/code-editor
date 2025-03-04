@@ -5,9 +5,8 @@ import JsCode from "../section/JsCode";
 import OutPut from "./OutPut";
 import { useSettings } from "../context/SettingContext";
 import { FiSave, FiTerminal} from "react-icons/fi";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import Console from "./Console";
+import ExportProject from "../popup/ExportProject";
 
 interface LogEntry {
   message: string;
@@ -67,39 +66,41 @@ const AllCodesEditor = () => {
     setConsoleCode(logEntries);
   };
 
-  const exportProject = async () => {
-    if (isExporting) return;
-    setIsExporting(true);
+//   const exportProject = async () => {
+//     if (isExporting) return;
+//     setIsExporting(true);
     
-    try {
-      const zip = new JSZip();
-      const fullHtml = `<!DOCTYPE html>
-<html>
-  <head>
-    <title>My Project</title>
-    <style>${cssCode}</style>
-  </head>
-  <body>
-    ${htmlCode.replace(/<html[\s\S]*?<\/html>/, '')}
-    <script>${jsCode}</script>
-  </body>
-</html>`;
+//     try {
+//       const zip = new JSZip();
+//       const fullHtml = `<!DOCTYPE html>
+// <html>
+//   <head>
+//     <title>My Project</title>
+//     <style>${cssCode}</style>
+//   </head>
+//   <body>
+//     ${htmlCode.replace(/<html[\s\S]*?<\/html>/, '')}
+//     <script>${jsCode}</script>
+//   </body>
+// </html>`;
 
-      zip.file("index.html", fullHtml);
-      zip.file("styles.css", cssCode);
-      zip.file("app.js", jsCode);
+//       zip.file("index.html", fullHtml);
+//       zip.file("styles.css", cssCode);
+//       zip.file("app.js", jsCode);
       
-      const content = await zip.generateAsync({ type: "blob" });
-      saveAs(content, "project.zip");
-    } catch (error) {
-      console.error("Export failed:", error);
-      alert("Export failed. Please check the console for details.");
-    } finally {
-      setIsExporting(false);
-    }
-  };
+//       const content = await zip.generateAsync({ type: "blob" });
+//       saveAs(content, "project.zip");
+//     } catch (error) {
+//       console.error("Export failed:", error);
+//       alert("Export failed. Please check the console for details.");
+//     } finally {
+//       setIsExporting(false);
+//     }
+//   };
 
-
+const exportProject =()=>{
+  setIsExporting(true)
+}
 
 
   return (
@@ -182,6 +183,8 @@ const AllCodesEditor = () => {
 
         <OutPut cssCode={cssCode} htmlCode={htmlCode} jsCode={jsCode} />
       </div>
+      
+      {isExporting && <ExportProject handleClose={()=>setIsExporting(false)}/>}
 
       {/* Fullscreen modal */}
       <div className={`fixed z-10 top-0 left-0 h-screen w-screen bg-gray-800/80 justify-center items-center ${
