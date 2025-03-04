@@ -9,7 +9,7 @@ const PlayGround = () => {
     <Navbar/>
     <main className=" flex flex-col justify-center items-center w-full">
         
-        <AllCodesEditor/>
+        <AllCodesEditor projectId=''/>
 
     </main>
 </div>

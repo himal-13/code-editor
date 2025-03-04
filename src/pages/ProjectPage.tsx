@@ -9,7 +9,7 @@ const ProjectPage = () => {
         <Navbar/>
         <h2>Project id:{params.id}</h2>
         <main>
-            <AllCodesEditor/>
+            <AllCodesEditor projectId={params.id??''}/>
 
         </main>
     </div>

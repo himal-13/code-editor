@@ -7,14 +7,16 @@ import { useSettings } from "../context/SettingContext";
 import { FiSave, FiTerminal} from "react-icons/fi";
 import Console from "./Console";
 import ExportProject from "../popup/ExportProject";
+import { useAuth } from "../context/AuthContext";
 
 interface LogEntry {
   message: string;
   type: "log" | "error";
 }
 
-const AllCodesEditor = () => {
+const AllCodesEditor = ({projectId}:{projectId:string}) => {
   const { fullScreenMode, changeFullScreenMode, theme } = useSettings();
+  const{updateProject} = useAuth()
   const [cssCode, setCssCode] = useState('body { margin: 0; padding: 20px; }');
   const [jsCode, setJsCode] = useState('console.log("Hello from JS!");');
   const [htmlCode, setHtmlCode] = useState(`<!DOCTYPE html>
@@ -184,7 +186,7 @@ const exportProject =()=>{
         <OutPut cssCode={cssCode} htmlCode={htmlCode} jsCode={jsCode} />
       </div>
       
-      {isExporting && <ExportProject handleClose={()=>setIsExporting(false)}/>}
+      {isExporting && <ExportProject uploadProject={()=>updateProject({projectId:projectId,html:htmlCode,css:cssCode,js:jsCode})} handleClose={()=>setIsExporting(false)}/>}
 
       {/* Fullscreen modal */}
       <div className={`fixed z-10 top-0 left-0 h-screen w-screen bg-gray-800/80 justify-center items-center ${

@@ -1,10 +1,16 @@
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, User, UserCredential } from "firebase/auth"
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { auth, db,} from "../services/Firebase"
-import { collection, getDocs } from "firebase/firestore"
+import { collection, doc,  getDocs, updateDoc } from "firebase/firestore"
 import { ProjectType } from "../popup/AddNewProject"
 
 
+interface UpdateProjectArgs{
+  projectId:string,
+  html:string,
+  js:string,
+  css:string
+}
 interface AuthContextType{
     currentUser:User|null,
     loading:boolean,
@@ -14,7 +20,8 @@ interface AuthContextType{
     dbUser:dbUserType | undefined,
     alldbUsers:dbUserType[] | [],
     projectLoading:boolean,
-    projects:ProjectType[]| undefined
+    projects:ProjectType[]| undefined,
+    updateProject:({projectId,html,css,js}:UpdateProjectArgs)=>Promise<void>
 
 }
 
@@ -105,6 +112,23 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
               projectData()
 
             },[currentUser])
+
+            const updateProject = async({projectId,html,css,js}:UpdateProjectArgs)=>{
+              if(projectId =='')return;
+              try{
+                const projectRef = doc(db,'projects',projectId)
+                await updateDoc(projectRef,{
+                  htmlCode:html,
+                  cssCode:css,
+                  jsCode:js                  
+
+                })
+                await getProjects()
+
+              }catch(e){
+
+              }
+            }
     const signup = useCallback((email:string, password:string) => {
         return createUserWithEmailAndPassword(auth, email, password);
       }, [auth]);
@@ -127,7 +151,8 @@ const AuthProvider:React.FC<{children:ReactNode}>=({children})=>{
           dbUser,
           alldbUsers,
           projectLoading,
-          projects
+          projects,
+          updateProject
 
         }),
         [
