@@ -1,4 +1,4 @@
-import { CircleLoader, ClipLoader, ClockLoader} from "react-spinners"
+import { ClipLoader, ClockLoader} from "react-spinners"
 import { useSettings } from "../context/SettingContext"
 import { IoMdClose } from "react-icons/io"
 import { useEffect, useState } from "react"
@@ -7,7 +7,7 @@ import { db } from "../services/Firebase"
 import { MdErrorOutline } from "react-icons/md"
 import { SiTicktick } from "react-icons/si"
 import { useAuth } from "../context/AuthContext"
-import { Await, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 
 export interface ProjectType{
