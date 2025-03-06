@@ -186,7 +186,7 @@ const exportProject =()=>{
         <OutPut cssCode={cssCode} htmlCode={htmlCode} jsCode={jsCode} />
       </div>
       
-      {isExporting && <ExportProject uploadProject={()=>updateProject({projectId:projectId,html:htmlCode,css:cssCode,js:jsCode})} handleClose={()=>setIsExporting(false)}/>}
+      {isExporting && <ExportProject cssCode={cssCode} htmlCode={htmlCode} jsCode={jsCode} uploadProject={()=>updateProject({projectId:projectId,html:htmlCode,css:cssCode,js:jsCode})} handleClose={()=>setIsExporting(false)}/>}
 
       {/* Fullscreen modal */}
       <div className={`fixed z-10 top-0 left-0 h-screen w-screen bg-gray-800/80 justify-center items-center ${
